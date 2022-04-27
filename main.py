@@ -1,11 +1,12 @@
 # from tkinter import *
 from math import *
-from tkinter.filedialog import *
+from tkinter import *
 
 import numpy as np
 import scipy
-from PIL import ImageTk, Image
-from cv2 import *
+from tkinter import filedialog as fd
+from PIL import ImageTk,Image
+import cv2
 from scipy import ndimage
 from scipy import signal
 
@@ -17,7 +18,7 @@ np.set_printoptions(threshold=np.inf, linewidth=850)
 
 def choosePic():
     global img
-    img_path = askopenfilename(initialdir='./DB3_B/', title='选择待识别图片',
+    img_path = fd.askopenfilename(initialdir='./DB3_B/', title='选择待识别图片',
                                filetypes=[("tif", "*.tif"), ("jpg", "*.jpg"), ("png", "*.png")])
     if img_path:
         print(img_path)
