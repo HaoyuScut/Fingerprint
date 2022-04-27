@@ -5,7 +5,7 @@ from tkinter.filedialog import *
 import numpy as np
 import scipy
 from PIL import ImageTk, Image
-from cv2 import *
+import cv2
 from scipy import ndimage
 from scipy import signal
 
