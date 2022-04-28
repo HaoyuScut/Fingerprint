@@ -29,7 +29,7 @@ def choosePic():
         rows, cols = np.shape(img)
         aspect_ratio = np.double(rows) / np.double(cols)
 
-        new_rows = 200  # randomly selected number
+        new_rows = 220  # randomly selected number
         new_cols = new_rows / aspect_ratio
 
         img = cv2.resize(img, (int(new_cols), int(new_rows)))
@@ -61,10 +61,11 @@ def image_enhance():
     kx = 0.65
     ky = 0.65
     newim = ridge_filter(normim, orientim, freq, kx, ky)  # create gabor filter and do the actual filtering
-    # imshow("new",newim)
+    cv2.imshow("new",newim)
 
     img = 255 * (newim >= -3)
-    # print(img)
+    print(img)
+
     show(img, enhanceImg)
 
 
