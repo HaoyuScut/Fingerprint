@@ -214,5 +214,5 @@ class Ui_MainWindow(object):
         self.pic_thinning.setText(_translate("MainWindow", "细化图片"))
         self.btn_feature.setText(_translate("MainWindow", "4.特征提取"))
         self.pic_feature.setText(_translate("MainWindow", "特征提取"))
-        self.label_2.setText(_translate("MainWindow", "端点显示："))
-        self.label_3.setText(_translate("MainWindow", "分叉点显示："))
+        self.label_2.setText(_translate("MainWindow", "端点显示（蓝色点）："))
+        self.label_3.setText(_translate("MainWindow", "分叉点显示（红色点）："))

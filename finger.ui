@@ -358,7 +358,7 @@
              </font>
             </property>
             <property name="text">
-             <string>端点显示：</string>
+             <string>端点显示（蓝色点）：</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -378,7 +378,7 @@
              </font>
             </property>
             <property name="text">
-             <string>分叉点显示：</string>
+             <string>分叉点显示（红色点）：</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>

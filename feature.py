@@ -1,11 +1,16 @@
 from math import *
 import cv2
+import numpy as np
 
 def image_feature(img):
     features_endpoint = []
     features_crosspoint = []
 
-    # endpoint = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    endimage = img.astype(np.uint8)
+    # endimage = np.array(endimage)
+    endimage = cv2.cvtColor(endimage, cv2.COLOR_GRAY2BGR)
+    # cv2.imshow(endimage)
+    cv2.waitKey(0)
     h, w = img.shape
     for i in range(1, h - 1):
         for j in range(1, w - 1):
@@ -187,9 +192,9 @@ def image_feature(img):
     # for i in range(len(features)):
     #     txtFeature.insert(END, str(features[i]) + '\n')
     for m in range(len(features_endpoint)):
-        cv2.circle(img, (features_endpoint[m][1][1], features_endpoint[m][1][0]), 3, (0, 0, 255), 1)
+        cv2.circle(endimage, (features_endpoint[m][1][1], features_endpoint[m][1][0]), 3, (0, 61, 245), -1)
 
     for m in range(len(features_crosspoint)):
-        cv2.circle(img, (features_crosspoint[m][1][1], features_crosspoint[m][1][0]), 3, (0, 0, 255), -1)
+        cv2.circle(endimage, (features_crosspoint[m][1][1], features_crosspoint[m][1][0]), 3, (255, 51, 51), -1)
 
-    return img,features_endpoint,features_crosspoint
+    return endimage,features_endpoint,features_crosspoint

@@ -42,6 +42,7 @@ class MainWindow(Ui_MainWindow,QtWidgets.QMainWindow):
 
     def enhance(self):
         global img
+
         print(type(img))
         print('img.shape', img.shape)
         if len(img.shape) > 2:
