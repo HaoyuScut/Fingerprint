@@ -9,39 +9,42 @@ def image_enhance(img):
     blksze = 16
     thresh = 0.1
     normim, mask = ridge_segment(img, blksze, thresh)  # normalise the image and find a ROI
-    cv2.imshow("norm", normim)
+    # cv2.imshow("norm", normim)
 
     gradientsigma = 1
     blocksigma = 7
     orientsmoothsigma = 7
     orientim = ridge_orient(normim, gradientsigma, blocksigma, orientsmoothsigma)  # find orientation of every pixel
-    cv2.imshow("orient", orientim)
+    # cv2.imshow("orient", orientim)
 
     # 绘制方向场图片
     img_d = np.copy(normim)
     ori = np.copy(orientim)
     img_draw = draw_orient(img_d, ori, 16)
-    cv2.imshow('img_draw',img_draw)
+    # cv2.imshow('img_draw',img_draw)
 
     blksze = 38
     windsze = 5
     minWaveLength = 5
     maxWaveLength = 15
-    freq, medfreq = ridge_freq(normim, mask, orientim, blksze, windsze, minWaveLength,
+    freq, meanfreq = ridge_freq(normim, mask, orientim, blksze, windsze, minWaveLength,
                                maxWaveLength)  # find the overall frequency of ridges
-    # imshow("freq", freq)
+    #freq： 整体频率 meanfreq:平均频率
+    # cv2.imshow("freq", freq)
 
-    freq = medfreq * mask
+    # 以平均值频率*ROI得到基于ROI的平均频率场
+    freq = meanfreq * mask
+    # cv2.imshow("ROI_freq", freq)
     kx = 0.65
     ky = 0.65
-    newim = ridge_filter(normim, orientim, freq, kx, ky)  # create gabor filter and do the actual filtering
-    # cv2.imshow("new",newim)
+    newim = ridge_filter(normim, orientim, freq, kx, ky)  # 创建gabor过滤器并进行实际的过滤
+    cv2.imshow("new",newim)
     # cv2.waitKey(0)
     # print(newim)
-    # print(newim.dtype)
+    print(newim.dtype)
 
     img = 255 * (newim >= -3)
-    # print(img.dtype)
+    print(img.dtype)
     # print(type(img))
     # print(img)
     # cv2.imshow("new", img)
@@ -59,7 +62,7 @@ def ridge_segment(im, blksze, thresh):  # img,16,0.1
 
     im = normalise(im)  # Z-score标准化
     # cv2.imshow("normalise",im)
-    print("img_shape: ", im.shape)
+    # print("img_shape: ", im.shape)
 
     #np.ceil 向上取整函数,将长和宽变为blksze的整数倍
     new_rows = np.int(blksze * np.ceil((np.float(rows)) / (np.float(blksze))))
@@ -93,7 +96,7 @@ def ridge_segment(im, blksze, thresh):  # img,16,0.1
     std_val = np.std(im[mask])
 
     normim = (im - mean_val) / (std_val)
-    cv2.imshow("norm",normim)
+    # cv2.imshow("norm",normim)
 
     return (normim, mask)
 
@@ -130,7 +133,7 @@ def ridge_orient(im, gradientsigma, blocksigma, orientsmoothsigma): #img,1,7,7
     Gxy = Gx * Gy
 
     # Now smooth the covariance data to perform a weighted summation of the data.
-
+    #现在平滑协方差数据，执行数据加权求和 高斯低通滤波器
     sze = np.fix(6 * blocksigma)
 
     gauss = cv2.getGaussianKernel(np.int(sze), blocksigma)
@@ -159,6 +162,7 @@ def ridge_orient(im, gradientsigma, blocksigma, orientsmoothsigma): #img,1,7,7
     orientim = np.pi / 2 + np.arctan2(sin2theta, cos2theta) / 2
     return orientim
 
+# 方向场可视化
 def draw_orient(img_d,ori,blksze):
     rows, cols = img_d.shape  # 获取图像的长和宽,row：行数，col：列数
 
@@ -186,27 +190,38 @@ def draw_orient(img_d,ori,blksze):
 
 
 
-
+# 求频率场 输入： im,masl,orient,38,5,5,15
 def ridge_freq(im, mask, orient, blksze, windsze, minWaveLength, maxWaveLength):
     rows, cols = im.shape
     freq = np.zeros((rows, cols))
 
+    # 指纹图像分成16x16大小的块，得到每一块的像素值和方向场
     for r in range(0, rows - blksze, blksze):
         for c in range(0, cols - blksze, blksze):
             blkim = im[r:r + blksze][:, c:c + blksze]
             blkor = orient[r:r + blksze][:, c:c + blksze]
-
+            # 求取每一小块的freq
             freq[r:r + blksze][:, c:c + blksze] = frequest(blkim, blkor, windsze, minWaveLength, maxWaveLength)
 
+    # 根据ROI位置得到对应ROI的freq (300,300)
     freq = freq * mask
+    # print("freq_shape:",freq.shape)
+    #转为一维数组 (1,90000)
     freq_1d = np.reshape(freq, (1, rows * cols))
+    # print("freq_1d_shape:", freq_1d.shape)
+    # np.where(freq_1d > 0) ：返回freq_1d中大于0元素的索引 得到（2，31768）的数组，第一行全为0
     ind = np.where(freq_1d > 0)
 
     ind = np.array(ind)
+    # print("ind_shape:", ind.shape)
+
+    # 只留第二行的内容，即freq_1d中大于0元素的索引
     ind = ind[1, :]
 
+    # 得到freq_1d中大于0元素的集合（31768,）
     non_zero_elems_in_freq = freq_1d[0][ind]
 
+    # 得到freq_1d中大于0元素的均值
     meanfreq = np.mean(non_zero_elems_in_freq)
     medianfreq = np.median(non_zero_elems_in_freq)  # does not work properly
     return freq, meanfreq
@@ -215,30 +230,25 @@ def ridge_freq(im, mask, orient, blksze, windsze, minWaveLength, maxWaveLength):
 def frequest(im, orientim, windsze, minWaveLength, maxWaveLength):
     rows, cols = np.shape(im)
 
-    # Find mean orientation within the block. This is done by averaging the
-    # sines and cosines of the doubled angles before reconstructing the
-    # angle again.  This avoids wraparound problems at the origin.
+    # 找到块内的平均方向。这是通过对两倍角的正弦和余弦求平均值来完成的，然后再重新构造这个角。这避免了在原点处出现问题。
 
     cosorient = np.mean(np.cos(2 * orientim))
     sinorient = np.mean(np.sin(2 * orientim))
     orient = atan2(sinorient, cosorient) / 2
 
-    # Rotate the image block so that the ridges are vertical
+    # 旋转图像块，使脊线垂直
 
     # ROT_mat = cv2.getRotationMatrix2D((cols/2,rows/2),orient/np.pi*180 + 90,1)
     # rotim = cv2.warpAffine(im,ROT_mat,(cols,rows))
     rotim = scipy.ndimage.rotate(im, orient / np.pi * 180 + 90, axes=(1, 0), reshape=False, order=3, mode='nearest')
 
-    # Now crop the image so that the rotated image does not contain any
-    # invalid regions.  This prevents the projection down the columns
-    # from being mucked up.
+    # 现在对图像进行裁剪，使旋转后的图像不包含任何无效区域。这样可以防止柱下的投影被弄脏。
 
     cropsze = int(np.fix(rows / np.sqrt(2)))
     offset = int(np.fix((rows - cropsze) / 2))
     rotim = rotim[offset:offset + cropsze][:, offset:offset + cropsze]
 
-    # Sum down the columns to get a projection of the grey values down
-    # the ridges.
+    # 对列求和，得到灰度值沿脊的投影。
 
     proj = np.sum(rotim, axis=0)
     dilation = scipy.ndimage.grey_dilation(proj, windsze, structure=np.ones(windsze))
@@ -252,10 +262,8 @@ def frequest(im, orientim, windsze, minWaveLength, maxWaveLength):
 
     rows_maxind, cols_maxind = np.shape(maxind)
 
-    # Determine the spatial frequency of the ridges by divinding the
-    # distance between the 1st and last peaks by the (No of peaks-1). If no
-    # peaks are detected, or the wavelength is outside the allowed bounds,
-    # the frequency image is set to 0
+    # 通过将第1个峰和最后一个峰之间的距离除以(峰数-1)来确定脊的空间频率。
+    # 如果没有峰值检测到，或波长超出允许的范围，频率图像设置为0
 
     if cols_maxind < 2:
         freqim = np.zeros(im.shape)
@@ -282,22 +290,23 @@ def ridge_filter(im, orient, freq, kx, ky):
     ind = np.array(ind)
     ind = ind[1, :]
 
-    # Round the array of frequencies to the nearest 0.01 to reduce the
-    # number of distinct frequencies we have to deal with.
+    # 将频率数组四舍五入到0.01，以减少我们必须处理的不同频率的数量。（同频率场操作）
 
     non_zero_elems_in_freq = freq_1d[0][ind]
+    # 四舍五入到小数点后两位
     non_zero_elems_in_freq = np.double(np.round((non_zero_elems_in_freq * 100))) / 100
 
+    #对于一维数组或者列表，unique函数去除其中重复的元素，并按元素由大到小返回一个新的无元素重复的元组或者列表
     unfreq = np.unique(non_zero_elems_in_freq)
 
-    # Generate filters corresponding to these distinct frequencies and
-    # orientations in 'angleInc' increments.
-
+    # 生成对应于这些不同的频率和方向在'angleInc'增量的滤波器
+    #sigmax sigmay分别是沿着x和y轴的高斯包络常量。
     sigmax = 1 / unfreq[0] * kx
     sigmay = 1 / unfreq[0] * ky
 
-    sze = np.int(np.round(3 * np.max([sigmax, sigmay])))
-
+    sze = np.int(np.round(3 * np.max([sigmax, sigmay]))) #sze：13
+    # numpy.meshgrid()——生成网格点坐标矩阵,即横坐标矩阵X中的每个元素，与纵坐标矩阵Y中对应位置元素
+    # 生成两个（27,27）的x、y矩阵
     x, y = np.meshgrid(np.linspace(-sze, sze, (2 * sze + 1)), np.linspace(-sze, sze, (2 * sze + 1)))
 
     reffilter = np.exp(-(((np.power(x, 2)) / (sigmax * sigmax) + (np.power(y, 2)) / (sigmay * sigmay)))) * np.cos(

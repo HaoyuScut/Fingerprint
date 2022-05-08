@@ -47,8 +47,8 @@ class MainWindow(Ui_MainWindow,QtWidgets.QMainWindow):
         print('img.shape', img.shape)
         if len(img.shape) > 2:
             img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)  # 转灰度图
-            cv2.imshow("original image", img)
-            cv2.waitKey(0)
+            # cv2.imshow("original image", img)
+            # cv2.waitKey(0)
         img = enhance.image_enhance(img)
 
         print(img.shape)
