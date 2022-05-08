@@ -10,6 +10,8 @@ def image_enhance(img):
     thresh = 0.1
     normim, mask = ridge_segment(img, blksze, thresh)  # normalise the image and find a ROI
     # cv2.imshow("norm", normim)
+    # print('type(normim)',type(normim))
+    print('normim_type:', normim.dtype)
 
     gradientsigma = 1
     blocksigma = 7
@@ -38,13 +40,15 @@ def image_enhance(img):
     kx = 0.65
     ky = 0.65
     newim = ridge_filter(normim, orientim, freq, kx, ky)  # 创建gabor过滤器并进行实际的过滤
-    cv2.imshow("new",newim)
+    # cv2.imshow("new",newim)
     # cv2.waitKey(0)
     # print(newim)
-    print(newim.dtype)
+    print('gabor_type:',newim.dtype)
+    # print('type(newim)', type(newim))
 
     img = 255 * (newim >= -3)
-    print(img.dtype)
+    print('threshold_type:',img.dtype)
+    # print('type(img)', type(img))
     # print(type(img))
     # print(img)
     # cv2.imshow("new", img)

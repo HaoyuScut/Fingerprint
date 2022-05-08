@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fed0caa3-ef0e-4f25-b400-13218ca51d93" name="Default Changelist" comment="final">
+    <list default="true" id="fed0caa3-ef0e-4f25-b400-13218ca51d93" name="Default Changelist" comment="加注释">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/enhance.py" beforeDir="false" afterPath="$PROJECT_DIR$/enhance.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/feature.py" beforeDir="false" afterPath="$PROJECT_DIR$/feature.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/show.py" beforeDir="false" afterPath="$PROJECT_DIR$/show.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/thinning.py" beforeDir="false" afterPath="$PROJECT_DIR$/thinning.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -190,7 +192,14 @@
       <option name="project" value="LOCAL" />
       <updated>1651994427514</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="加注释">
+      <created>1652001962093</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1652001962093</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -208,15 +217,16 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="qt success" />
     <MESSAGE value="final" />
-    <option name="LAST_COMMIT_MESSAGE" value="final" />
+    <MESSAGE value="加注释" />
+    <option name="LAST_COMMIT_MESSAGE" value="加注释" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/enhance.py</url>
-          <line>50</line>
-          <option name="timeStamp" value="5" />
+          <url>file://$PROJECT_DIR$/feature.py</url>
+          <line>75</line>
+          <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

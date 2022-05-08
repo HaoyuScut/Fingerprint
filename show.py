@@ -22,6 +22,7 @@ class MainWindow(Ui_MainWindow,QtWidgets.QMainWindow):
             print(imgName)
             img = cv2.imdecode(np.fromfile(imgName, dtype=np.uint8), cv2.IMREAD_COLOR)
             print(type(img))
+            print('origin_type:',img.dtype)
             if len(img.shape) > 2:
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # 转灰度图
 
@@ -43,17 +44,16 @@ class MainWindow(Ui_MainWindow,QtWidgets.QMainWindow):
     def enhance(self):
         global img
 
-        print(type(img))
-        print('img.shape', img.shape)
+        # print(type(img))
+        # print('img.shape', img.shape)
         if len(img.shape) > 2:
             img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)  # 转灰度图
             # cv2.imshow("original image", img)
             # cv2.waitKey(0)
+
         img = enhance.image_enhance(img)
-
-        print(img.shape)
+        # print(img.shape)
         img_enhance = Image.fromarray(uint8(img))
-
         img_enhance = ImageQt.toqpixmap(img_enhance).scaled(self.pic_enhance.width(), self.pic_enhance.height())
         self.pic_enhance.setPixmap(img_enhance)
 

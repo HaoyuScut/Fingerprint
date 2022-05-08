@@ -1,6 +1,7 @@
 def image_thinning(img, num=10):
     # iXihua = cv.CreateImage(cv.GetSize(image), 8, 1)
     # cv.Copy(image, iXihua)
+    # 细化参考表
     array = [0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1,
              1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
              0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1,

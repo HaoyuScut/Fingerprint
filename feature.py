@@ -6,6 +6,7 @@ def image_feature(img):
     features_endpoint = []
     features_crosspoint = []
 
+    #转为cv可显示的BGR格式，便于进行彩色显示
     endimage = img.astype(np.uint8)
     # endimage = np.array(endimage)
     endimage = cv2.cvtColor(endimage, cv2.COLOR_GRAY2BGR)
@@ -14,21 +15,21 @@ def image_feature(img):
     h, w = img.shape
     for i in range(1, h - 1):
         for j in range(1, w - 1):
-            if img[i, j] == 0:  # 像素点为黑
+            if img[i, j] == 0:  # 如果像素点为黑，即可能有特征点
                 m = i
                 n = j
 
                 eightField = [img[m - 1, n - 1], img[m - 1, n], img[m - 1, n + 1], img[m, n - 1], img[m, n + 1],
                               img[m + 1, n - 1], img[m + 1, n], img[m + 1, n + 1]]
 
-                if sum(eightField) / 255 == 7:  # 黑色块1个，端点
+                if sum(eightField) / 255 == 7:  # 白色块7个，黑色块1个，端点
 
                     # 判断是否为指纹图像边缘
                     if sum(img[:i, j]) == 255 * i or sum(img[i + 1:, j]) == 255 * (w - i - 1) or sum(
                             img[i, :j]) == 255 * j or sum(img[i, j + 1:]) == 255 * (h - j - 1):
                         continue
                     canContinue = 1
-                    # print(m, n)
+                    print(m, n)
                     coordinate = [[m - 1, n - 1], [m - 1, n], [m - 1, n + 1], [m, n - 1], [m, n + 1], [m + 1, n - 1],
                                   [m + 1, n], [m + 1, n + 1]]
                     for o in range(8):  # 寻找相连接的下一个点
@@ -38,7 +39,8 @@ def image_feature(img):
                             n = coordinate[o][1]
                             # print(m, n, index)
                             break
-                    # print(m, n, index)
+                    print(m, n, index)
+
                     for k in range(4):
                         coordinate = [[m - 1, n - 1], [m - 1, n], [m - 1, n + 1], [m, n - 1], [m, n + 1],
                                       [m + 1, n - 1], [m + 1, n], [m + 1, n + 1]]
@@ -87,8 +89,8 @@ def image_feature(img):
                     canContinue = 1
                     # 筛除不符合的分叉点
                     for o in range(8):  # 寻找相连接的下一个点
-                        if eightField[o] == 0:
-                            junctions.append(o)
+                        if eightField[o] == 0: #若该点为黑色
+                            junctions.append(o) #将三个黑色点存入junctions
                             junctionCoordinates.append(coordinate[o])
                     for k in range(3):
                         if k == 0:
