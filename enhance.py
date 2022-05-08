@@ -9,13 +9,19 @@ def image_enhance(img):
     blksze = 16
     thresh = 0.1
     normim, mask = ridge_segment(img, blksze, thresh)  # normalise the image and find a ROI
-    # imshow("norm", normim)
+    cv2.imshow("norm", normim)
 
     gradientsigma = 1
     blocksigma = 7
     orientsmoothsigma = 7
     orientim = ridge_orient(normim, gradientsigma, blocksigma, orientsmoothsigma)  # find orientation of every pixel
-    # imshow("orient", orientim)
+    cv2.imshow("orient", orientim)
+
+    # 绘制方向场图片
+    img_d = np.copy(normim)
+    ori = np.copy(orientim)
+    img_draw = draw_orient(img_d, ori, 16)
+    cv2.imshow('img_draw',img_draw)
 
     blksze = 38
     windsze = 5
@@ -41,33 +47,45 @@ def image_enhance(img):
     # cv2.imshow("new", img)
     return img
 
+# Z-score标准化（0-1标准化）方法，通过原始数据均值和单位标准差进行归一化
+# 经过处理的数据符合标准正态分布，即均值为0，标准差为1。
 def normalise(img):
     normed = (img - np.mean(img)) / (np.std(img))
     return normed
 
 def ridge_segment(im, blksze, thresh):  # img,16,0.1
 
-    rows, cols = im.shape
+    rows, cols = im.shape #获取图像的长和宽,row：行数，col：列数
 
-    im = normalise(im)  # normalise to get zero mean and unit standard deviation 归一化？
-    # imshow("norm",im)
+    im = normalise(im)  # Z-score标准化
+    # cv2.imshow("normalise",im)
+    print("img_shape: ", im.shape)
 
+    #np.ceil 向上取整函数,将长和宽变为blksze的整数倍
     new_rows = np.int(blksze * np.ceil((np.float(rows)) / (np.float(blksze))))
     new_cols = np.int(blksze * np.ceil((np.float(cols)) / (np.float(blksze))))
 
     padded_img = np.zeros((new_rows, new_cols))
+    # print("padded_img.shape: ",padded_img.shape)
     stddevim = np.zeros((new_rows, new_cols))
 
+    #将im的参数传入到（304,304）的padded_img矩阵，多的地方补零
+    #X[:,m:n] ，取二维数组的第m列到第n-1列所有行的数据,
+    # 本文代码相当于做了两次切片，第一次选出padded_img的前rows行，第二次行不变，选出前cols列
     padded_img[0:rows][:, 0:cols] = im
+    # print("padded_img: ", padded_img)
 
+    #指纹图像分成16x16大小的块
     for i in range(0, new_rows, blksze):
         for j in range(0, new_cols, blksze):
             block = padded_img[i:i + blksze][:, j:j + blksze]
 
+            #np.std()函数 被用来计算沿指定轴的标准差。 返回数组元素的标准差
             stddevim[i:i + blksze][:, j:j + blksze] = np.std(block) * np.ones(block.shape)
 
     stddevim = stddevim[0:rows][:, 0:cols]
 
+    # 根据标准差和阈值的对比得出感兴趣区域
     mask = stddevim > thresh
 
     mean_val = np.mean(im[mask])
@@ -75,19 +93,25 @@ def ridge_segment(im, blksze, thresh):  # img,16,0.1
     std_val = np.std(im[mask])
 
     normim = (im - mean_val) / (std_val)
-    # imshow("norm",normim)
+    cv2.imshow("norm",normim)
 
     return (normim, mask)
 
 
-def ridge_orient(im, gradientsigma, blocksigma, orientsmoothsigma):
+def ridge_orient(im, gradientsigma, blocksigma, orientsmoothsigma): #img,1,7,7
 
-    # Calculate image gradients.
+    #  Calculate image gradients.
+    # np.fix:四舍五入数组
+    #一般高斯核尺寸通过计算得到：6*sigma+1 要保证尺寸的宽度和高度都为奇数
     sze = np.fix(6 * gradientsigma)
+    # 返回两个数组arr1和arr2之间的除法元素余数
     if np.remainder(sze, 2) == 0:
-        sze = sze + 1
+        sze = sze + 1  # sze = 7.(浮点数)
 
+    #高斯滤波器系数矩阵。getGaussianKernel() 函数计算并返回维度为 ksize×1 的高斯滤波器系数矩阵：
+    #生成一维高斯核，（7，1）
     gauss = cv2.getGaussianKernel(np.int(sze), gradientsigma)
+    #生成二维高斯核
     f = gauss * gauss.T
 
     fy, fx = np.gradient(f)  # Gradient of Gaussian
@@ -95,9 +119,12 @@ def ridge_orient(im, gradientsigma, blocksigma, orientsmoothsigma):
     # Gx = ndimage.convolve(np.double(im),fx);
     # Gy = ndimage.convolve(np.double(im),fy);
 
+
+    #对图像的单通道进行卷积操作，计算图像的7*7 的Sobel算子模板
     Gx = signal.convolve2d(im, fx, mode='same')
     Gy = signal.convolve2d(im, fy, mode='same')
 
+    # power(x, y) 函数，计算 x 的 y 次方。
     Gxx = np.power(Gx, 2)
     Gyy = np.power(Gy, 2)
     Gxy = Gx * Gy
@@ -113,7 +140,8 @@ def ridge_orient(im, gradientsigma, blocksigma, orientsmoothsigma):
     Gyy = ndimage.convolve(Gyy, f)
     Gxy = 2 * ndimage.convolve(Gxy, f)
 
-    # Analytic solution of principal direction
+    # Analytic solution of principal direction，计算出近似梯度
+    # 参考https://blog.csdn.net/great_yzl/article/details/119709699
     denom = np.sqrt(np.power(Gxy, 2) + np.power((Gxx - Gyy), 2)) + np.finfo(float).eps
 
     sin2theta = Gxy / denom  # Sine and cosine of doubled angles
@@ -130,6 +158,33 @@ def ridge_orient(im, gradientsigma, blocksigma, orientsmoothsigma):
 
     orientim = np.pi / 2 + np.arctan2(sin2theta, cos2theta) / 2
     return orientim
+
+def draw_orient(img_d,ori,blksze):
+    rows, cols = img_d.shape  # 获取图像的长和宽,row：行数，col：列数
+
+    for r in range(0, rows - blksze, blksze):
+        for c in range(0,cols - blksze, blksze):
+            draw_img = img_d
+            tmp = ori[r][c]
+            cx = r + blksze/2
+            cy = c + blksze/2
+
+            x0 = int(cy - np.cos(tmp) * 5)
+            y0 = int(cx - np.sin(tmp) * 5)
+
+            x1 = int(cy + np.cos(tmp) * 5)
+            y1 = int(cx + np.sin(tmp) * 5)
+
+            point1 = (x0,y0)
+            point2 = (x1,y1)
+            point_color = (255, 255, 255)  # BGR
+            thickness = 1
+            lineType = 8
+            cv2.line(draw_img, point1, point2, point_color, thickness, lineType)
+
+    return draw_img
+
+
 
 
 def ridge_freq(im, mask, orient, blksze, windsze, minWaveLength, maxWaveLength):
