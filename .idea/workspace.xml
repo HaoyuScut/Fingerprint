@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fed0caa3-ef0e-4f25-b400-13218ca51d93" name="Default Changelist" comment="加注释">
-      <change afterPath="$PROJECT_DIR$/feature1.py" afterDir="false" />
+    <list default="true" id="fed0caa3-ef0e-4f25-b400-13218ca51d93" name="Default Changelist" comment="最终版ui为finger_add">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/show.py" beforeDir="false" afterPath="$PROJECT_DIR$/show.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,7 +29,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Anaconda/Anaconda3/envs/Finger/Scripts/pyuic5.exe" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="preferences.externalTools" />
   </component>
   <component name="RunManager" selected="Python.show">
@@ -204,7 +202,14 @@
       <option name="project" value="LOCAL" />
       <updated>1652021045789</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="最终版ui为finger_add">
+      <created>1652168242645</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1652168242645</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -223,7 +228,8 @@
     <MESSAGE value="qt success" />
     <MESSAGE value="final" />
     <MESSAGE value="加注释" />
-    <option name="LAST_COMMIT_MESSAGE" value="加注释" />
+    <MESSAGE value="最终版ui为finger_add" />
+    <option name="LAST_COMMIT_MESSAGE" value="最终版ui为finger_add" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
